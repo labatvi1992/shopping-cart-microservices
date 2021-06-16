@@ -14,11 +14,11 @@ import java.util.Map;
 
 @ControllerAdvice
 @RestController
-@RequestMapping("/inventories")
+@RequestMapping("/transactions")
 public class TransactionController extends BaseController<Transaction> {
 
     @Autowired
-    public TransactionController(@Qualifier("inventories") TransactionService service) {
+    public TransactionController(@Qualifier("transactions") TransactionService service) {
         super(service);
     }
 
