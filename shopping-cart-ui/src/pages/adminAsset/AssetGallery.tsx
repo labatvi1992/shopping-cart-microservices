@@ -63,7 +63,7 @@ export default function AssetGallery(prop: IAssetGalleryProp): JSX.Element {
         <fieldset className="field-set">
             <legend>
                 <span>Tài nguyên</span>
-                <Button className="btn-create-new" disabled={_.isEmpty(group)} onClick={() => showModal('Tải lên')}>
+                <Button className="btn-create-new" disabled={!group} onClick={() => showModal('Tải lên')}>
                     Tải lên
                 </Button>
             </legend>
