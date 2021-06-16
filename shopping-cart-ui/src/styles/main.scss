@@ -1,0 +1,294 @@
+@import "./base";
+
+html,
+body,
+#root {
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+.app-root {
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.app-root {
+    .main-layout {
+        height: 100%;
+        .main-header {
+            width: 100%;
+            background: $header-bg;
+            padding: $container-padding;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .main-slogan {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                height: 80px;
+                &-icon {
+                    font-size: 48px;
+                    color: $header-color;
+                }
+                &-content {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    line-height: normal;
+                    margin: 0 15px;
+                }
+                &-logo {
+                    display: flex;
+                    align-items: center;
+                }
+                &-text {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: $header-color;
+                    text-shadow: 0px 2px 2px rgba(255, 255, 255, 0.4);
+                }
+                &-desc {
+                    font-size: 14px;
+                    color: $header-color;
+                }
+                .main-search {
+                    flex: 1;
+                    &-input {
+                        display: flex;
+                        align-items: center;
+                        .ant-input {
+                            font-size: 14px;
+                        }
+                        .ant-input-group-addon {
+                            button {
+                                background: #0d5cb6;
+                                border: 0 !important;
+                                display: flex;
+                                align-items: center;
+                                .main-search-addon-icon {
+                                    font-size: 20px;
+                                }
+                            }
+                        }
+                    }
+                }
+                .top-menu {
+                    margin: 0 15px;
+                    .ant-menu {
+                        display: flex;
+                        justify-content: flex-end;
+                        background: $header-bg;
+                        border-bottom: 1px solid transparent;
+                        .ant-menu-item {
+                            display: flex;
+                            align-items: center;
+                            margin: 0 5px;
+                            padding: 0 16px;
+                            border-radius: 3px;
+                            color: $header-color;
+                            font-size: 15px;
+                            height: 42px;
+                            line-height: 42px;
+                            .fa {
+                                font-size: 24px;
+                            }
+                        }
+                        .ant-menu-item-active {
+                            background: rgba(243, 243, 243, .4);
+                        }
+                        .ant-menu-item-selected {
+                            background: rgba(243, 243, 243, .4);
+                        }
+                    }
+                }
+                .my-account {
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    height: 42px;
+                    font-size: 15px;
+                    padding: 0 16px;
+                    color: $header-color;
+                    border-radius: 3px;
+                    &:hover {
+                        background: rgba(243, 243, 243, .4);
+                    }
+                    &-icon {
+                        font-size: 28px;
+                        color: $header-color;
+                    }
+                    &-button {
+                        padding: 8px;
+                    }
+                }
+            }
+        }
+        .main-content {
+            min-height: calc(100vh - #{$header-height} - 10px);
+            display: flex;
+            flex-direction: column;
+            &-children {
+                padding: $container-padding;
+                flex: 1;
+            }
+        }
+        .main-footer {
+            color: #333;
+            background: #fff;
+            padding: 0;
+            &-introduction {
+                padding: $container-padding;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                border-top: 1px solid rgb(247, 247, 247);
+                border-bottom: 1px solid rgb(247, 247, 247);
+                .col-intro {
+                    p {
+                        text-align: justify;
+                    }
+                    &-title {
+                        padding: 15px 0 5px;
+                        font-size: 17px;
+                        font-weight: 600;
+                        color: #444;
+                        border-bottom: 2px solid #ddd;
+                    }
+                }
+                .subcribe-form {
+                    align-items: center;
+                    .subcribe-icon {
+                        font-size: 48px;
+                        margin: 0 10px;
+                    }
+                }
+            }
+            .footer-copy-right {
+                background: #fff;
+                color: #333;
+                padding: $container-padding;
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+        }
+    }
+}
+
+.app-not-found {
+    height: 100%;
+    color: #000;
+    .ant-empty {
+        height: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.popover-my-account {
+    .ant-popover-inner-content {
+        padding: 10px;
+        .login-button {
+            margin: 0 0 5px 0;
+            border: 1px solid $primary-color;
+            background: $primary-color;
+            color: $text-primary-color;
+        }
+    }
+}
+
+.loading {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hide {
+    display: none;
+}
+
+.image-viewer {
+    .image-fallback {
+        font-size: 36px;
+    }
+}
+
+.main-section {
+    margin: 15px 0;
+    border-radius: 3px;
+    background: #fff;
+    -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .14);
+    -moz-box-shadow:    0 1px 4px 0 rgba(0, 0, 0, .14);
+    box-shadow:         0 1px 4px 0 rgba(0, 0, 0, .14);
+    .title {
+        color: $primary-color;
+        padding: 16px;
+        border-bottom: 1px solid rgb(244, 244, 244);
+        font-size: 16px;
+        text-transform: uppercase;
+    }
+    .body {
+        padding: 16px 0;
+    }
+}
+
+.carousel-container {
+    position: relative;
+    &:hover {
+        .BrainhubCarousel__arrows {
+            background: rgba(0, 0, 0, 0.4);
+        }
+    }
+    .BrainhubCarousel__arrows {
+        background: rgba(0, 0, 0, 0.15);
+        position: absolute;
+        z-index: 1;
+        padding: 24px 16px;
+    }
+    .BrainhubCarousel__arrowLeft {
+        left: 0;
+        border-radius: 0 3px 3px 0;
+        > span {
+            margin-left: 2.45px !important;
+        }
+    }
+    .BrainhubCarousel__arrowRight {
+        right: 0;
+        border-radius: 3px 0 0 3px;
+        > span {
+            margin-left: -2.45px !important;
+        }
+    }
+    .BrainhubCarousel__dots {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+}
+
+.ant-input-number {
+    width: 100%;
+}
+
+.ant-back-top {
+    right: 85px;
+    .back-top-button {
+        font-size: 30px;
+        padding: 10px;
+        border-radius: 50%;
+        background: $primary-color;
+        color: $text-primary-color;
+    }
+}
+
+@import "./home.scss";
+@import "./product.scss";
+@import "./cart.scss";
+@import "./asset.scss";
+@import "./admin.scss";

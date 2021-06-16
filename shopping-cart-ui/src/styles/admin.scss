@@ -1,0 +1,259 @@
+.app-root {
+    .app-layout {
+        min-height: 100vh;
+        height: 100%;
+        .app-header {
+            width: 100%;
+            height: $header-height;
+            display: flex;
+            align-items: center;
+            background: $admin-header-bg;
+            padding: 0 20px;
+            z-index: 1;
+            .app-addresses {
+                display: flex;
+                align-items: center;
+                .app-breadcrumb {
+                    flex: 1;
+                    height: $breadcrumb-height;
+                    padding: 12px 0;
+                    display: flex;
+                    align-items: center;
+                    &-item {
+                        cursor: default;
+                        .fa {
+                            font-size: 16px;
+                            margin: 0 5px 0 0;
+                        }
+                        &:hover {
+                            color: inherit;
+                        }
+                        &.app-breadcrumb-item-link {
+                            cursor: pointer;
+                            &:hover {
+                                color: $primary-color;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .app-menu {
+            width: $menu-width;
+            height: 100%;
+            background: $menu-bg;
+            position: fixed;
+            left: 0;
+            -webkit-box-shadow: 0 16px 38px -12px rgba(0, 0, 0, .56), 0 4px 25px 0px rgba(0, 0, 0, .12), 0 8px 10px -5px rgba(0, 0, 0, .2);
+            -moz-box-shadow: 0 16px 38px -12px rgba(0, 0, 0, .56), 0 4px 25px 0px rgba(0, 0, 0, .12), 0 8px 10px -5px rgba(0, 0, 0, .2);
+            box-shadow: 0 16px 38px -12px rgba(0, 0, 0, .56), 0 4px 25px 0px rgba(0, 0, 0, .12), 0 8px 10px -5px rgba(0, 0, 0, .2);
+            .app-logo {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: $header-height;
+                padding: 12px 0;
+                margin-bottom: 1px;
+                background: transparent;
+                .app-logo-link {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100%;
+                    .app-logo-text {
+                        height: inherit;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        color: $admin-header-color;
+                        font-size: 18px;
+                        text-transform: uppercase;
+                    }
+                }
+            }
+            .ant-menu {
+                height: calc(100% - #{$header-height} - 1px);
+                padding: 10px;
+                background: transparent;
+                .fa {
+                    font-size: 18px;
+                }
+                .ant-menu-submenu-title {
+                    > span {
+                        margin-left: 8px;
+                    }
+                }
+                .ant-menu-submenu-expand-icon,
+                .ant-menu-submenu-arrow {
+                    color: inherit;
+                }
+                .ant-menu-item-selected {
+                    &::after {
+                        display: none;
+                    }
+                }
+            }
+            .app-divider {
+                height: 1px;
+                width: calc(100% - 30px);
+                background-color: rgba(180, 180, 180, 0.3);
+            }
+        }
+        .site-layout {
+            margin-left: $menu-width;
+            .site-content {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                padding: 0 20px;
+                .site-content-layout {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    border-radius: 2px;
+                    .fit-content {
+                        flex: 1;
+                    }
+                }
+            }
+            .app-footer {
+                padding: 4px 20px;
+            }
+        }
+    }
+}
+
+.popover-change-theme-container {
+    > div {
+        cursor: pointer;
+        padding: 3px 0;
+        &.selected {
+            color: $primary-color;
+            font-weight: 500;
+        }
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.field-set {
+    border: 1px solid $primary-color;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .14);
+    -moz-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .14);
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .14);
+    legend {
+        display: flex;
+        align-items: center;
+        margin: 0 5px;
+        padding: 0 5px;
+        width: auto;
+        background: transparent;
+        border-radius: 5px;
+    }
+}
+
+.btn-create-new {
+    margin: 0 8px;
+    border: 0;
+    padding: 3px 6px;
+    height: 28px;
+    background: $primary-color !important;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    .fa {
+        margin: 0 4px;
+        font-size: 12px;
+    }
+    .fa,
+    span {
+        color: $text-primary-color;
+    }
+    &:disabled {
+        background: $grey-color !important;
+    }
+}
+
+.btn-update {
+    margin: 4px;
+    border: 0;
+    padding: 3px 6px;
+    height: 28px;
+    background: $success-color !important;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    .fa {
+        margin: 0 4px;
+        font-size: 12px;
+    }
+    .fa,
+    span {
+        color: $text-success-color;
+    }
+    &:disabled {
+        background: $grey-color !important;
+    }
+}
+
+.btn-delete {
+    margin: 4px;
+    border: 0;
+    padding: 3px 6px;
+    height: 28px;
+    background: $danger-color !important;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    .fa {
+        margin: 0 4px;
+        font-size: 12px;
+    }
+    .fa,
+    span {
+        color: $text-danger-color;
+    }
+    &:disabled {
+        background: $grey-color !important;
+    }
+}
+
+.base-grid {
+    padding: 10px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    .tree-cell-expandable {
+        display: flex;
+        .tree-cell-expander {
+            width: 30px;
+            cursor: pointer;
+        }
+    }
+    .ant-table-filter-column {
+        .ant-table-filter-trigger {
+            margin: -4px 4px;
+        }
+    }
+    .ant-table-body {
+        overflow-y: auto !important;
+    }
+    .ant-table-tbody > tr > td {
+        padding: 4px 16px;
+    }
+    .ant-pagination {
+        margin: 8px 0;
+    }
+}
+
+.empty-text {
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
