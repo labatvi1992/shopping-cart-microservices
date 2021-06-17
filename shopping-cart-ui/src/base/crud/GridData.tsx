@@ -1,8 +1,11 @@
-import { FC, useCallback, useState } from 'react';
-import { Modal, Table, Form } from 'antd';
+import { useCallback, useState } from 'react';
+import { Collapse, Modal, Table, Form, TableProps, ModalProps, FormProps } from 'antd';
 import { GridContainer } from './GridContainer';
 import { IRecord } from '../Common';
 import Empty from '../Empty';
+import { buildStore } from './Util';
+
+const { Panel } = Collapse;
 
 const defaultFormOptions = {
     labelCol: { span: 6 },
@@ -11,20 +14,22 @@ const defaultFormOptions = {
 
 export interface IGridDataProp {
     data?: IRecord[];
-    filterLegend?: string;
-    filterOptions?: Record<string, unknown>;
-    gridOptions?: Record<string, unknown>;
-    modalOptions?: Record<string, unknown>;
-    formOptions?: Record<string, unknown>;
+    filterHeader?: string;
+    filterOptions?: FormProps;
+    gridPaging?: boolean;
+    gridOptions?: TableProps<IRecord>;
+    modalOptions?: ModalProps;
+    formOptions?: FormProps;
     renderFilterBody?: () => JSX.Element;
     renderFormBody?: () => JSX.Element;
 }
 
-export const GridData: FC<IGridDataProp> = (prop: IGridDataProp) => {
+export function GridData(prop: IGridDataProp): JSX.Element {
     const {
         data,
+        gridPaging,
         gridOptions,
-        filterLegend,
+        filterHeader,
         filterOptions,
         modalOptions,
         formOptions,
@@ -35,14 +40,17 @@ export const GridData: FC<IGridDataProp> = (prop: IGridDataProp) => {
     const [filterForm] = Form.useForm();
     const [modalForm] = Form.useForm();
 
+    const store = buildStore(gridPaging);
+
     const renderFilter = useCallback((): JSX.Element => {
         return (
-            <fieldset className="grid-filter">
-                <legend>{filterLegend}</legend>
-                <Form {...filterOptions} form={filterForm}>
-                    {renderFilterBody && renderFilterBody()}
-                </Form>
-            </fieldset>
+            <Collapse defaultActiveKey={['1']} className="grid-filter">
+                <Panel header={filterHeader} key="1">
+                    <Form {...filterOptions} form={filterForm}>
+                        {renderFilterBody && renderFilterBody()}
+                    </Form>
+                </Panel>
+            </Collapse>
         );
     }, [renderFilterBody]);
 
@@ -74,4 +82,4 @@ export const GridData: FC<IGridDataProp> = (prop: IGridDataProp) => {
     }, [visible, modalOptions, renderFormBody]);
 
     return <GridContainer renderFilter={renderFilter} renderGrid={renderGrid} renderModal={renderModal} />;
-};
+}
