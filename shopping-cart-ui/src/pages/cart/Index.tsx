@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Image, Form, Row, Col, Button, InputNumber } from 'antd';
+import { Image, Form, Row, Col, Button, Input, InputNumber } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import {
     Api,
@@ -10,14 +10,17 @@ import {
     Loading,
     updateItemOnCart,
     removeItemFromCart,
+    NOT_EMPTY,
+    clearCartItems,
 } from '../../base';
-import CustomerForm from './CustomerForm';
 
 interface ICartState {
     loading: boolean;
     items?: ICartItem[];
     totalPrice?: number;
 }
+
+const ORDER_LIST_KEY = 'orderDetails';
 
 const getCartItemIds = () => {
     return getItemsFromCart().map((item) => item.id);
@@ -56,27 +59,57 @@ export default function Cart(): JSX.Element {
         if (response?.status === 200) {
             const state = recalculateState(_.get(response, 'data.data', []));
             setData(() => {
-                form.setFieldsValue({
-                    orderList: state.items,
-                });
+                const fieldValues: Record<string, unknown> = {};
+                _.set(fieldValues, ORDER_LIST_KEY, state.items);
+                form.setFieldsValue(fieldValues);
                 return state;
             });
         }
     };
 
     const handleValuesChange = (changes: Record<number, unknown>, values: Record<number, unknown>) => {
-        const id = _.head(Object.keys(_.get(changes, 'orderList'))) ?? '';
-        const count = _.get(changes, `orderList.${id}.count`);
-        const itemId = _.get(values, `orderList.${id}.id`);
-        const updateItem: ICartItem = {
-            id: `${itemId}`,
-            count: count,
-        };
-        updateItemOnCart(updateItem);
-        const state = recalculateState(_.get(values, 'orderList'));
-        setData(() => {
-            return state;
+        if (_.get(changes, ORDER_LIST_KEY)) {
+            const id = _.head(Object.keys(_.get(changes, ORDER_LIST_KEY)));
+            if (!_.isEmpty(id)) {
+                const count = _.get(changes, `${ORDER_LIST_KEY}.${id}.count`);
+                const itemId = _.get(values, `${ORDER_LIST_KEY}.${id}.id`);
+                const updateItem: ICartItem = {
+                    id: `${itemId}`,
+                    count: count,
+                };
+                updateItemOnCart(updateItem);
+                const state = recalculateState(_.get(values, ORDER_LIST_KEY));
+                setData(() => {
+                    return state;
+                });
+            }
+        }
+    };
+
+    const handleSubmit = async (values: any) => {
+        const orderDetails = _.get(values, ORDER_LIST_KEY, []);
+        const submitDetails = orderDetails.map((item: ICartItem) => {
+            return {
+                product: item.id,
+                count: item.count,
+                price: _.get(item, 'price'),
+            };
         });
+        const submitValues = _.assign({}, { customer: _.get(values, 'customer'), orderDetails: submitDetails });
+        try {
+            const response = await axios.post(`${Api.orderApi}`, submitValues);
+            if (response?.status === 200) {
+                console.log(response.data);
+                form.resetFields();
+                clearCartItems();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const onOrderClicked = () => {
+        form.submit();
     };
 
     useEffect(() => {
@@ -99,11 +132,12 @@ export default function Cart(): JSX.Element {
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 16 }}
                         onValuesChange={handleValuesChange}
+                        onFinish={handleSubmit}
                     >
                         <Row>
                             <Col span={16}>
                                 <div className="order-list">
-                                    <Form.List name="orderList">
+                                    <Form.List name={ORDER_LIST_KEY}>
                                         {(fields, { remove }) => (
                                             <>
                                                 {fields.map(({ key, name, fieldKey, ...restField }) => (
@@ -112,7 +146,7 @@ export default function Cart(): JSX.Element {
                                                             {({ getFieldValue }) => (
                                                                 <Image
                                                                     src={getFieldValue([
-                                                                        'orderList',
+                                                                        ORDER_LIST_KEY,
                                                                         name,
                                                                         'imageDefault',
                                                                     ])}
@@ -133,13 +167,13 @@ export default function Cart(): JSX.Element {
                                                                     className="product-name-link"
                                                                     target="_blank"
                                                                     href={`/san-pham/${getFieldValue([
-                                                                        'orderList',
+                                                                        ORDER_LIST_KEY,
                                                                         name,
                                                                         'categoryId',
-                                                                    ])}/${getFieldValue(['orderList', name, 'id'])}`}
+                                                                    ])}/${getFieldValue([ORDER_LIST_KEY, name, 'id'])}`}
                                                                     rel="noreferrer"
                                                                 >
-                                                                    {getFieldValue(['orderList', name, 'name'])}
+                                                                    {getFieldValue([ORDER_LIST_KEY, name, 'name'])}
                                                                 </a>
                                                             )}
                                                         </Form.Item>
@@ -151,7 +185,7 @@ export default function Cart(): JSX.Element {
                                                         >
                                                             {({ getFieldValue }) =>
                                                                 `${formatNumber(
-                                                                    getFieldValue(['orderList', name, 'price']) ?? 0,
+                                                                    getFieldValue([ORDER_LIST_KEY, name, 'price']) ?? 0,
                                                                 )}đ`
                                                             }
                                                         </Form.Item>
@@ -170,12 +204,12 @@ export default function Cart(): JSX.Element {
                                                                     onClick={() => {
                                                                         const removeItem: ICartItem = {
                                                                             id: `${getFieldValue([
-                                                                                'orderList',
+                                                                                ORDER_LIST_KEY,
                                                                                 name,
                                                                                 'id',
                                                                             ])}`,
                                                                             count: getFieldValue([
-                                                                                'orderList',
+                                                                                ORDER_LIST_KEY,
                                                                                 name,
                                                                                 'count',
                                                                             ]),
@@ -203,9 +237,34 @@ export default function Cart(): JSX.Element {
                                 <div className="order-customer">
                                     <fieldset className="field-set">
                                         <legend>Thông tin khách hàng</legend>
-                                        <CustomerForm />
+                                        <Form.Item
+                                            name={['customer', 'name']}
+                                            label="Họ tên"
+                                            rules={[{ required: true, message: NOT_EMPTY }]}
+                                        >
+                                            <Input />
+                                        </Form.Item>
+                                        <Form.Item
+                                            name={['customer', 'email']}
+                                            label="Email"
+                                            rules={[{ required: true, message: NOT_EMPTY }]}
+                                        >
+                                            <Input />
+                                        </Form.Item>
+                                        <Form.Item
+                                            name={['customer', 'phone']}
+                                            label="Số điện thoại"
+                                            rules={[{ required: true, message: NOT_EMPTY }]}
+                                        >
+                                            <Input />
+                                        </Form.Item>
+                                        <Form.Item name={['customer', 'address']} label="Địa chỉ">
+                                            <Input />
+                                        </Form.Item>
                                         <div className="order-submit">
-                                            <Button className="order-submit-button">Tiến hành đặt hàng</Button>
+                                            <Button className="order-submit-button" onClick={onOrderClicked}>
+                                                Tiến hành đặt hàng
+                                            </Button>
                                         </div>
                                     </fieldset>
                                 </div>

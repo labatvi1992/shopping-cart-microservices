@@ -6,5 +6,6 @@ import AdminCustomer from './adminCustomer/CustomerGrid';
 import AdminCategory from './adminCategory/CategoryGrid';
 import AdminProduct from './adminProduct/ProductGrid';
 import AdminAsset from './adminAsset/AssetView';
+import AdminOrder from './adminOrder/OrderView';
 
-export { Home, Product, ProductDetail, Cart, AdminCustomer, AdminCategory, AdminProduct, AdminAsset };
+export { Home, Product, ProductDetail, Cart, AdminCustomer, AdminCategory, AdminProduct, AdminAsset, AdminOrder };

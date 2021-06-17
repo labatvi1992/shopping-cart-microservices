@@ -9,6 +9,12 @@ export const RouterData: IRoute[] = [
         exact: false,
         children: [
             {
+                id: '/don-hang',
+                component: Pages.AdminOrder,
+                exact: true,
+                breadcrumbs: [homeItem, adminItem, { text: 'Đơn hàng' }],
+            },
+            {
                 id: '/danh-muc',
                 component: Pages.AdminCategory,
                 exact: true,

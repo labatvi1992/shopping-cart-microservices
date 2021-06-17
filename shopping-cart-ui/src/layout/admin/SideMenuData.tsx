@@ -1,5 +1,10 @@
 export default [
     {
+        text: 'Đơn hàng',
+        icon: 'fa fa-files-o',
+        route: '/quan-ly/don-hang',
+    },
+    {
         text: 'Danh mục',
         icon: 'fa fa-th-large',
         route: '/quan-ly/danh-muc',

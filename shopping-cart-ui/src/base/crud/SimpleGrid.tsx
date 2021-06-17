@@ -18,6 +18,7 @@ import {
     ISearch,
 } from '../Common';
 import { Grid } from './Grid';
+import { buildParams, buildStore, PAGE_SIZE, PAGE_SIZE_OPTIONS } from './Util';
 
 export interface ISimpleGridProp {
     breadcrumbs: IBreadcrumbItem[];
@@ -28,57 +29,6 @@ export interface ISimpleGridProp {
     paging?: boolean;
     transformToPostData?: (data: IRecord) => unknown;
 }
-
-const buildStore = (paging?: boolean): IStore => {
-    const initPaging: IPaging = {
-        current: 0,
-        pageSize: 10,
-    };
-    return {
-        searchKey: undefined,
-        paging: paging ? initPaging : undefined,
-        sorting: undefined,
-        searchCriteria: undefined,
-    };
-};
-
-const buildParams = (store: IStore): unknown => {
-    const params = {};
-    if (store.searchKey) {
-        _.set(params, 'searchKey', store.searchKey ?? '');
-    }
-    if (store.paging) {
-        // console.log('paging: ', store.paging);
-        _.set(
-            params,
-            'paging',
-            btoa(
-                JSON.stringify({
-                    pageNo: store.paging?.current.toString(),
-                    pageSize: store.paging?.pageSize.toString(),
-                }),
-            ),
-        );
-    }
-    if (store.sorting) {
-        // console.log('sorting: ', store.sorting);
-        _.set(
-            params,
-            'sorting',
-            btoa(
-                JSON.stringify({
-                    key: store.sorting?.key.toString() ?? '',
-                    direction: store.sorting?.direction.toString() ?? '',
-                }),
-            ),
-        );
-    }
-    if (store.searchCriteria) {
-        // console.log('searchCriteria: ', store.searchCriteria);
-        _.set(params, 'searchCriteria', btoa(JSON.stringify(store.searchCriteria)));
-    }
-    return params;
-};
 
 export function SimpleGrid(prop: ISimpleGridProp): JSX.Element {
     const { breadcrumbs, name, api, columns, form, paging, transformToPostData } = prop || {};
@@ -214,9 +164,9 @@ export function SimpleGrid(prop: ISimpleGridProp): JSX.Element {
             );
         };
         const pagingOptions: TablePaginationConfig = {
-            defaultPageSize: 10,
+            defaultPageSize: PAGE_SIZE,
             pageSize: data.store.paging?.pageSize,
-            pageSizeOptions: ['10', '20', '50', '100'],
+            pageSizeOptions: PAGE_SIZE_OPTIONS,
             total: data.total,
             showSizeChanger: true,
             showTotal: (total, range) => `${range[0]}-${range[1]} / Tổng cộng ${total} dòng`,
