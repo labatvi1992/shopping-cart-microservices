@@ -44,16 +44,10 @@ public class FileController extends BaseController<File> {
     }
 
     @Override
-    protected String beforeSave(boolean isCreate, File entity) {
+    protected void beforeSave(boolean isCreate, File entity) throws Exception {
         MultipartFile file = entity.getFile();
-        try {
-            entity.setName(file.getOriginalFilename());
-            entity.setPath(saveFile(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
-        return "";
+        entity.setName(file.getOriginalFilename());
+        entity.setPath(saveFile(file));
     }
 
     @GetMapping

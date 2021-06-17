@@ -96,6 +96,9 @@ public class BaseController<T> {
             }
             // sorting only, no paging
             if (!params.containsKey("paging")) {
+                if (searchResult == null || sortable == null) {
+                    return findAll();
+                }
                 return ResponseEntity.ok(BaseResponse.success(service.findAll(searchResult, sortable)));
             } else {
                 // sorting and paging
@@ -129,18 +132,14 @@ public class BaseController<T> {
         return ResponseEntity.ok(BaseResponse.success(entity));
     }
 
-    protected String beforeSave(boolean isCreate, T entity) {
-        return "";
+    protected void beforeSave(boolean isCreate, T entity) throws Exception {
     }
 
-    protected void afterSave(T entity) {
+    protected void afterSave(T entity) throws Exception {
     }
 
     protected ResponseEntity<BaseResponse> addEntity(T newEntity) throws Exception {
-        String beforeSaveResult = beforeSave(true, newEntity);
-        if (!beforeSaveResult.equals("")) {
-            throw new Exception(beforeSaveResult);
-        }
+        beforeSave(true, newEntity);
         T entity = service.add(newEntity);
         afterSave(entity);
         if (entity == null) {
@@ -155,10 +154,7 @@ public class BaseController<T> {
         if (!entity.isPresent()) {
             throw new NotFoundException("Not found");
         }
-        String beforeSaveResult = beforeSave(false, updateEntity);
-        if (!beforeSaveResult.equals("")) {
-            throw new Exception(beforeSaveResult);
-        }
+        beforeSave(false, updateEntity);
         T entityResult = service.update(updateEntity);
         afterSave(entityResult);
         return ResponseEntity.ok(BaseResponse.success(entityResult));
