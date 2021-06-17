@@ -1,4 +1,4 @@
-import { Row, Col, Form, Input, DatePicker } from 'antd';
+import { Row, Col, Button, Form, Input, DatePicker } from 'antd';
 import { ColumnsType } from 'antd/lib/table/Table';
 import { useEffect } from 'react';
 import { Api, GridData, IRecord } from '../../../base';
@@ -42,7 +42,7 @@ export default function NewOrder(prop: IOrderProp): JSX.Element {
     return (
         <div className="new-order-view">
             <GridData
-                filterHeader="Tìm kiếm nhiều tiêu chí"
+                filterHeader="Tìm kiếm nâng cao"
                 filterOptions={{
                     labelAlign: 'left',
                     labelCol: { span: 3 },
@@ -63,6 +63,16 @@ export default function NewOrder(prop: IOrderProp): JSX.Element {
                         </Row>
                     );
                 }}
+                renderAction={(): JSX.Element => {
+                    return (
+                        <>
+                            <Button icon={<i className="fa fa-plus" />} className="btn-create-new">
+                                Tạo mới
+                            </Button>
+                        </>
+                    );
+                }}
+                gridPaging={true}
                 gridOptions={{
                     columns,
                 }}

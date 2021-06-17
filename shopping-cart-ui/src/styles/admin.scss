@@ -228,6 +228,11 @@
 .grid-container {
     .grid-filter {
     }
+    .grid-action {
+        padding: 8px 0;
+        display: flex;
+        align-items: center;
+    }
     .grid-data {
         border: 1px solid #d9d9d9;
     }
