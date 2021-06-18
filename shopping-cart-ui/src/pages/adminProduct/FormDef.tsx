@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Form, Input, Checkbox, InputNumber, Select } from 'antd';
-import { NOT_EMPTY, IForm, Api } from '../../base';
+import { Form, Input, Checkbox, InputNumber, Select, FormInstance } from 'antd';
+import { NOT_EMPTY, Api, IRecord } from '../../base';
 
-function formDef(prop: IForm): JSX.Element {
+function formDef(form: FormInstance, data?: IRecord): JSX.Element {
     const [dataOption, setDataOption] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const { data, form } = prop || {};
                 const requests = [axios.get(Api.categoryApi)];
                 if (data && data.key) {
                     requests.push(axios.get(`${Api.productApi}/${data.key}`));
@@ -31,7 +30,7 @@ function formDef(prop: IForm): JSX.Element {
             }
         };
         fetchData();
-    }, [prop]);
+    }, []);
     return (
         <>
             <Form.Item name="code" label="Mã sản phẩm" rules={[{ required: true, message: NOT_EMPTY }]}>

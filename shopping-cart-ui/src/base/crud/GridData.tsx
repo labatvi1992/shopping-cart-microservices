@@ -15,6 +15,7 @@ export interface IGridDataProp {
     filterOptions?: FormProps;
     gridOptions?: TableProps<IRecord>;
     renderFilterBody?: (form: FormInstance) => JSX.Element;
+    onFilter?: (values: unknown) => void;
     renderAction?: () => JSX.Element;
     renderAddition?: () => JSX.Element;
     onLoadData?: (store?: IStore) => Promise<Record<string, unknown>>;
@@ -37,6 +38,7 @@ export function GridData(prop: IGridDataProp): JSX.Element {
         filterHeader,
         filterOptions,
         renderFilterBody,
+        onFilter,
         renderAction,
         renderAddition,
         onLoadData,
@@ -74,7 +76,7 @@ export function GridData(prop: IGridDataProp): JSX.Element {
         return (
             <Collapse defaultActiveKey={['1']} className="grid-filter">
                 <Panel header={filterHeader} key="1">
-                    <Form {...filterOptions} form={filterForm}>
+                    <Form {...filterOptions} form={filterForm} onFinish={onFilter}>
                         {renderFilterBody && renderFilterBody(filterForm)}
                     </Form>
                 </Panel>

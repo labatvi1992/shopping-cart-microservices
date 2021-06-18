@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
-import { Form, Input, Checkbox } from 'antd';
-import { NOT_EMPTY, IForm, Api } from '../../base';
+import { Form, Input, Checkbox, FormInstance } from 'antd';
+import { NOT_EMPTY, Api, IRecord } from '../../base';
 
-function formDef(prop: IForm): JSX.Element {
+function formDef(form: FormInstance, data?: IRecord): JSX.Element {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const { data, form } = prop || {};
                 const requests = [];
                 if (data && data.key) {
                     requests.push(axios.get(`${Api.categoryApi}/${data.key}`));
@@ -20,7 +19,7 @@ function formDef(prop: IForm): JSX.Element {
             }
         };
         fetchData();
-    }, [prop]);
+    }, []);
     return (
         <>
             <Form.Item name="name" label="Tên danh mục" rules={[{ required: true, message: NOT_EMPTY }]}>

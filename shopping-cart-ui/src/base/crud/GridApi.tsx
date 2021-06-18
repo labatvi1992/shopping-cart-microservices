@@ -26,7 +26,8 @@ export interface IGridApiProp extends IGridDataProp {
     modalOptions?: ModalProps;
     formOptions?: FormProps;
     renderActionColumn?: () => ColumnsType<IRecord>;
-    onSaveForm?: (api: string, values: unknown) => Promise<AxiosResponse>;
+    onSubmitData?: (values: unknown) => unknown;
+    onSaveForm?: (api: string, state: string | undefined, values: unknown) => Promise<AxiosResponse>;
     renderFormBody?: (form: FormInstance, data?: IRecord) => JSX.Element;
 }
 
@@ -48,8 +49,9 @@ export function GridApi(prop: IGridApiProp): JSX.Element {
         breadcrumbs,
         modalOptions,
         formOptions,
-        renderFormBody,
         renderActionColumn,
+        renderFormBody,
+        onSubmitData,
         onSaveForm,
         ...lastProp
     } = prop || {};
@@ -117,7 +119,11 @@ export function GridApi(prop: IGridApiProp): JSX.Element {
         try {
             const submitValues = _.assign({}, modalState.data, values);
             if (onSaveForm) {
-                const response = await onSaveForm(api, submitValues);
+                const response = await onSaveForm(
+                    api,
+                    modalState.state,
+                    onSubmitData ? onSubmitData(submitValues) : submitValues,
+                );
                 if (response?.status === 200) {
                     switch (modalState.state) {
                         case 'create':
