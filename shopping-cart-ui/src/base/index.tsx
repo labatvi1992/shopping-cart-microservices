@@ -7,6 +7,8 @@ import Themer from './Themer';
 export * from './crud/Grid';
 export * from './crud/SimpleGrid';
 export * from './crud/GridData';
+export * from './crud/GridApi';
+export * from './crud/Util';
 export * from './crud/FilterInput';
 export * from './carousel/Basic';
 

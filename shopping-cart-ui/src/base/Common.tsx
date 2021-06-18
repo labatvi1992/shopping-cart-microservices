@@ -51,8 +51,9 @@ export interface IForm {
 export interface IModal {
     isVisible: boolean;
     title: string | undefined;
-    form: FC<IForm> | undefined;
-    data: IRecord | undefined;
+    state?: string;
+    form?: FC<IForm> | undefined;
+    data?: IRecord | undefined;
 }
 
 export interface IMenuItem {
@@ -85,7 +86,7 @@ export interface ISearch {
 }
 
 export interface IStore {
-    searchKey: string | undefined;
+    searchKey?: string;
     paging?: IPaging;
     sorting?: ISorting;
     searchCriteria?: ISearch[];

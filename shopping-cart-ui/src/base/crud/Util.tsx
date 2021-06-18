@@ -15,12 +15,12 @@ export const buildStore = (paging?: boolean): IStore => {
     };
 };
 
-export const buildParams = (store: IStore): unknown => {
+export const buildParams = (store?: IStore): unknown => {
     const params = {};
-    if (store.searchKey) {
+    if (store?.searchKey) {
         _.set(params, 'searchKey', store.searchKey ?? '');
     }
-    if (store.paging) {
+    if (store?.paging) {
         _.set(
             params,
             'paging',
@@ -32,7 +32,7 @@ export const buildParams = (store: IStore): unknown => {
             ),
         );
     }
-    if (store.sorting) {
+    if (store?.sorting) {
         _.set(
             params,
             'sorting',
@@ -44,7 +44,7 @@ export const buildParams = (store: IStore): unknown => {
             ),
         );
     }
-    if (store.searchCriteria) {
+    if (store?.searchCriteria) {
         _.set(params, 'searchCriteria', btoa(JSON.stringify(store.searchCriteria)));
     }
     return params;

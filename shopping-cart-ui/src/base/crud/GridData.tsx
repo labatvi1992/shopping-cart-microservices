@@ -1,77 +1,73 @@
-import { useCallback, useState } from 'react';
-import { Collapse, Modal, Table, Form, TableProps, ModalProps, FormProps } from 'antd';
+import { useCallback, useEffect, useState } from 'react';
+import { Collapse, Table, Form, TableProps, FormProps, FormInstance } from 'antd';
+import { FilterValue, SorterResult } from 'antd/lib/table/interface';
 import { TablePaginationConfig } from 'antd/lib/table/Table';
 import { GridContainer } from './GridContainer';
-import { IRecord, IStore } from '../Common';
-import { AxiosResponse } from '../../types/axios';
+import { IPaging, IRecord, ISorting, IStore } from '../Common';
 import Empty from '../Empty';
-import { buildStore, PAGE_SIZE, PAGE_SIZE_OPTIONS } from './Util';
+import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from './Util';
 
 const { Panel } = Collapse;
 
 export interface IGridDataProp {
+    store?: IStore;
     filterHeader?: string;
     filterOptions?: FormProps;
-    gridPaging?: boolean;
     gridOptions?: TableProps<IRecord>;
-    modalOptions?: ModalProps;
-    formOptions?: FormProps;
-    renderFilterBody?: () => JSX.Element;
+    renderFilterBody?: (form: FormInstance) => JSX.Element;
     renderAction?: () => JSX.Element;
-    renderFormBody?: () => JSX.Element;
+    renderAddition?: () => JSX.Element;
+    onLoadData?: (store?: IStore) => Promise<Record<string, unknown>>;
+    onProcessData?: (data: Record<string, unknown>) => Record<string, unknown>;
+    onDataChange?: (store?: IStore) => void;
 }
 
 export interface IGridDataState {
     loading: boolean;
     rows: IRecord[];
-    store?: IStore;
+    currentPage?: number;
+    pageSize?: number;
     total?: number;
 }
 
-const defaultFormOptions = {
-    labelCol: { span: 6 },
-    wrapperCol: { span: 18 },
-};
-
-const defaultState: IGridDataState = {
-    loading: true,
-    rows: [],
-    store: undefined,
-    total: 0,
-};
-
 export function GridData(prop: IGridDataProp): JSX.Element {
     const {
-        gridPaging,
+        store,
         gridOptions,
         filterHeader,
         filterOptions,
-        modalOptions,
-        formOptions,
         renderFilterBody,
         renderAction,
-        renderFormBody,
+        renderAddition,
+        onLoadData,
+        onProcessData,
+        onDataChange,
     } = prop || {};
     const [filterForm] = Form.useForm();
-    const [modalForm] = Form.useForm();
 
-    const [data, setData] = useState<IGridDataState>(_.assign({}, defaultState, { store: buildStore(gridPaging) }));
+    const [data, setData] = useState<IGridDataState>({
+        loading: false,
+        rows: [],
+        currentPage: store?.paging?.current,
+        pageSize: store?.paging?.pageSize,
+        total: 0,
+    });
 
-    const getStore = () => {
-        return data.store;
-    };
+    useEffect(() => {
+        load(store);
+    }, [store]);
 
-    const setDataStore = async (
-        loadData: () => Promise<AxiosResponse>,
-        processData: (response: AxiosResponse) => Record<string, unknown>,
-    ) => {
-        setData((state) => {
-            return { ...state, loading: true };
-        });
-        const responseData: AxiosResponse = await loadData();
-        setData((state) => {
-            return { ...state, loading: false, ...processData(responseData) };
-        });
+    const load = async (_store?: IStore) => {
+        if (onLoadData) {
+            setData((state) => {
+                return { ...state, loading: true };
+            });
+            const responseData = await onLoadData(_store);
+            setData((state) => {
+                const transform = onProcessData && onProcessData(responseData);
+                return { ...state, loading: false, ...transform };
+            });
+        }
     };
 
     const renderFilter = useCallback((): JSX.Element => {
@@ -79,7 +75,7 @@ export function GridData(prop: IGridDataProp): JSX.Element {
             <Collapse defaultActiveKey={['1']} className="grid-filter">
                 <Panel header={filterHeader} key="1">
                     <Form {...filterOptions} form={filterForm}>
-                        {renderFilterBody && renderFilterBody()}
+                        {renderFilterBody && renderFilterBody(filterForm)}
                     </Form>
                 </Panel>
             </Collapse>
@@ -89,36 +85,51 @@ export function GridData(prop: IGridDataProp): JSX.Element {
     const renderGrid = useCallback((): JSX.Element => {
         const pagingOptions: TablePaginationConfig = {
             defaultPageSize: PAGE_SIZE,
-            pageSize: data.store?.paging?.pageSize,
+            pageSize: data.pageSize,
             pageSizeOptions: PAGE_SIZE_OPTIONS,
             total: data.total,
             showSizeChanger: true,
             showTotal: (total, range) => `${range[0]}-${range[1]} / Tổng cộng ${total} dòng`,
         };
+
+        const handleGridChange = (
+            pagination: TablePaginationConfig,
+            _filters: Record<string, FilterValue | null>,
+            sorter: SorterResult<IRecord> | SorterResult<IRecord>[],
+        ) => {
+            let newPaging: IPaging | undefined = undefined;
+            if (!_.isEmpty(pagination)) {
+                newPaging = {
+                    current: (pagination.current ?? 1) - 1,
+                    pageSize: pagination.pageSize ?? 0,
+                };
+            }
+            let newSorting: ISorting | undefined = undefined;
+            if (!_.isEmpty(sorter) && _.get(sorter, 'column')) {
+                newSorting = {
+                    key: _.get(sorter, 'field'),
+                    direction: _.get(sorter, 'order'),
+                };
+            }
+            onDataChange && onDataChange({ paging: newPaging, sorting: newSorting });
+        };
+
         return (
             <>
                 {renderAction && <div className="grid-action">{renderAction()}</div>}
                 <Table
                     {...gridOptions}
                     className="grid-data"
+                    loading={data.loading}
                     locale={{
                         emptyText: Empty,
                     }}
-                    pagination={gridPaging ? pagingOptions : false}
+                    pagination={store?.paging ? pagingOptions : false}
+                    onChange={handleGridChange}
                 />
             </>
         );
-    }, [data, gridPaging, gridOptions, renderAction]);
+    }, [data, gridOptions, renderAction]);
 
-    const renderModal = useCallback((): JSX.Element => {
-        return (
-            <Modal {...modalOptions}>
-                <Form {..._.assign({}, defaultFormOptions, formOptions)} form={modalForm}>
-                    {renderFormBody && renderFormBody()}
-                </Form>
-            </Modal>
-        );
-    }, [modalOptions, renderFormBody]);
-
-    return <GridContainer renderFilter={renderFilter} renderGrid={renderGrid} renderModal={renderModal} />;
+    return <GridContainer renderFilter={renderFilter} renderGrid={renderGrid} renderAddition={renderAddition} />;
 }
