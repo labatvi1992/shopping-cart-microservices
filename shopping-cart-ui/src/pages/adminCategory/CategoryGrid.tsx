@@ -16,7 +16,8 @@ export default function CategoryGrid(prop: ICategoryGridProp): JSX.Element {
             filterHeader="Tìm kiếm nâng cao"
             filterOptions={{
                 labelAlign: 'left',
-                labelCol: { span: 3 },
+                labelCol: { span: 6 },
+                wrapperCol: { span: 18 },
             }}
             renderFilterBody={(): JSX.Element => {
                 return (

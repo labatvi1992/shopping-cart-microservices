@@ -4,8 +4,6 @@ import Loading from './Loading';
 import NotFound from './NotFound';
 import Themer from './Themer';
 
-export * from './crud/Grid';
-export * from './crud/SimpleGrid';
 export * from './crud/GridData';
 export * from './crud/GridApi';
 export * from './crud/Util';
