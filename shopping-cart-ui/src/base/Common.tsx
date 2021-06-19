@@ -86,10 +86,13 @@ export interface ISearch {
 }
 
 export interface IStore {
+    loading?: boolean;
     searchKey?: string;
     paging?: IPaging;
     sorting?: ISorting;
     searchCriteria?: ISearch[];
+    rows?: IRecord[];
+    total?: number;
 }
 
 export function formatNumber(num: number): string {

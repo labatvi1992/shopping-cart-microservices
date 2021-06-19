@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { Collapse, Table, Form, TableProps, FormProps, FormInstance } from 'antd';
 import { FilterValue, SorterResult } from 'antd/lib/table/interface';
 import { TablePaginationConfig } from 'antd/lib/table/Table';
@@ -18,17 +18,7 @@ export interface IGridDataProp {
     onFilter?: (values: unknown) => void;
     renderAction?: () => JSX.Element;
     renderAddition?: () => JSX.Element;
-    onLoadData?: (store?: IStore) => Promise<Record<string, unknown>>;
-    onProcessData?: (data: Record<string, unknown>) => Record<string, unknown>;
     onDataChange?: (store?: IStore) => void;
-}
-
-export interface IGridDataState {
-    loading: boolean;
-    rows: IRecord[];
-    currentPage?: number;
-    pageSize?: number;
-    total?: number;
 }
 
 export function GridData(prop: IGridDataProp): JSX.Element {
@@ -41,36 +31,9 @@ export function GridData(prop: IGridDataProp): JSX.Element {
         onFilter,
         renderAction,
         renderAddition,
-        onLoadData,
-        onProcessData,
         onDataChange,
     } = prop || {};
     const [filterForm] = Form.useForm();
-
-    const [data, setData] = useState<IGridDataState>({
-        loading: false,
-        rows: [],
-        currentPage: store?.paging?.current,
-        pageSize: store?.paging?.pageSize,
-        total: 0,
-    });
-
-    useEffect(() => {
-        load(store);
-    }, [store]);
-
-    const load = async (_store?: IStore) => {
-        if (onLoadData) {
-            setData((state) => {
-                return { ...state, loading: true };
-            });
-            const responseData = await onLoadData(_store);
-            setData((state) => {
-                const transform = onProcessData && onProcessData(responseData);
-                return { ...state, loading: false, ...transform };
-            });
-        }
-    };
 
     const renderFilter = useCallback((): JSX.Element => {
         return (
@@ -87,9 +50,9 @@ export function GridData(prop: IGridDataProp): JSX.Element {
     const renderGrid = useCallback((): JSX.Element => {
         const pagingOptions: TablePaginationConfig = {
             defaultPageSize: PAGE_SIZE,
-            pageSize: data.pageSize,
+            pageSize: store?.paging?.pageSize,
             pageSizeOptions: PAGE_SIZE_OPTIONS,
-            total: data.total,
+            total: store?.total,
             showSizeChanger: true,
             showTotal: (total, range) => `${range[0]}-${range[1]} / Tổng cộng ${total} dòng`,
         };
@@ -122,7 +85,6 @@ export function GridData(prop: IGridDataProp): JSX.Element {
                 <Table
                     {...gridOptions}
                     className="grid-data"
-                    loading={data.loading}
                     locale={{
                         emptyText: Empty,
                     }}
@@ -131,7 +93,7 @@ export function GridData(prop: IGridDataProp): JSX.Element {
                 />
             </>
         );
-    }, [data, gridOptions, renderAction]);
+    }, [store?.loading, gridOptions, renderAction]);
 
     return <GridContainer renderFilter={renderFilter} renderGrid={renderGrid} renderAddition={renderAddition} />;
 }

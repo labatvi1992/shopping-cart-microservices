@@ -7,6 +7,7 @@ import {
     ACTION_COLUMN_TITLE,
     CHECK_INPUT,
     CREATED_SUCCESS,
+    UPDATED_SUCCESS,
     DELETE_CONFIRM,
     DELETE_SUCCESS,
     IBreadcrumbItem,
@@ -14,7 +15,6 @@ import {
     IModal,
     IRecord,
     IStore,
-    UPDATED_SUCCESS,
 } from '../Common';
 import { GridData, IGridDataProp } from './GridData';
 import { buildParams } from './Util';
@@ -26,6 +26,7 @@ export interface IGridApiProp extends IGridDataProp {
     modalOptions?: ModalProps;
     formOptions?: FormProps;
     renderActionColumn?: () => ColumnsType<IRecord>;
+    onProcessData?: (data: Record<string, unknown>) => Record<string, unknown>;
     onSubmitData?: (values: unknown) => unknown;
     onSaveForm?: (api: string, state: string | undefined, values: unknown) => Promise<AxiosResponse>;
     renderFormBody?: (form: FormInstance, data?: IRecord) => JSX.Element;
@@ -51,6 +52,7 @@ export function GridApi(prop: IGridApiProp): JSX.Element {
         formOptions,
         renderActionColumn,
         renderFormBody,
+        onProcessData,
         onSubmitData,
         onSaveForm,
         ...lastProp
@@ -63,19 +65,32 @@ export function GridApi(prop: IGridApiProp): JSX.Element {
 
     const loadData = async (_store?: IStore) => {
         try {
+            setStore((state) => {
+                return { ...state, loading: true };
+            });
             const response = await axios.get(api, { params: buildParams(_store) });
+            let responseData: Record<string, unknown> = {};
             if (response?.status === 200) {
-                return {
+                responseData = {
                     rows: _.get(response, 'data.data', []),
                     total: _.get(response, 'data.total', 0),
                 };
             }
-            return {};
+            setStore((state) => {
+                const transform = onProcessData && onProcessData(responseData);
+                return { ...state, loading: false, ...transform };
+            });
         } catch (error) {
             notification.error({ message: error.message });
-            return {};
+            setStore((state) => {
+                return { ...state, loading: false };
+            });
         }
     };
+
+    useEffect(() => {
+        loadData(store);
+    }, []);
 
     useEffect(() => {
         breadcrumbs && setBreadcrumbs && setBreadcrumbs(breadcrumbs);
@@ -94,8 +109,13 @@ export function GridApi(prop: IGridApiProp): JSX.Element {
             >
                 Tạo mới
             </Button>
+            <Button icon={<i className="fa fa-refresh" />} className="btn-update" onClick={() => handleRefresh()}>
+                Tải lại
+            </Button>
         </>
     );
+
+    const handleRefresh = () => loadData(store);
 
     const handleShow = (title: string, state: string, data?: IRecord) => {
         modalForm.resetFields();
@@ -134,6 +154,7 @@ export function GridApi(prop: IGridApiProp): JSX.Element {
                             break;
                     }
                     handleCancel();
+                    loadData(store);
                 }
             }
         } catch (error) {
@@ -218,11 +239,14 @@ export function GridApi(prop: IGridApiProp): JSX.Element {
     return (
         <GridData
             {...lastProp}
-            gridOptions={_.assign({}, lastProp.gridOptions, { columns: mergedColumns })}
+            gridOptions={_.assign({}, lastProp.gridOptions, {
+                loading: store?.loading,
+                dataSource: store?.rows,
+                columns: mergedColumns,
+            })}
             renderAction={renderAction}
             renderAddition={renderModal}
             store={store}
-            onLoadData={loadData}
             onDataChange={handleDataChange}
         />
     );
